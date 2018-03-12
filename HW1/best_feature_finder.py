@@ -24,7 +24,7 @@ class BestFeatureFinder:
         return entropy
 
     def best_feature(self):
-        best_info_gain = 0.0
+        best_info_gain = -1
         best_feature = -1
 
         for i in range(self.number_of_features):
