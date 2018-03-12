@@ -1,5 +1,10 @@
-import matplotlib.pyplot as plt
+dependency_check = True
 from tree_utils import get_tree_depth, get_number_of_leafs
+
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    dependency_check = False
 
 decision_node = dict(boxstyle="sawtooth", fc="0.8")
 leaf_node = dict(boxstyle="round4", fc="0.8")
@@ -50,6 +55,9 @@ def plot_tree(tree, parent_point, text):
 
 
 def create_plot(in_tree):
+    if not dependency_check:
+        return
+
     fig = plt.figure(1, facecolor='white')
     fig.clf()
 
