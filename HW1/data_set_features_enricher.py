@@ -1,18 +1,24 @@
 class DataSetFeaturesEnricher:
-    def __init__(self, data_set):
+    def __init__(self, data_set, features_method_names):
         self.data_set = data_set
-        self.enriched_data_set = [[] for _ in range(len(data_set))]
+        self.enriched_data_set = []
+        self.features_method_names = features_method_names
 
-    def get_enrich_data_set(self, features_method_names):
-        for j, entry in enumerate(self.data_set, start=0):
-            for method_name in features_method_names:
-                new_value = getattr(self, method_name)(entry[0])
-                self.enriched_data_set[j].append(new_value)
-
-            self.enriched_data_set[j].append(entry[1])
-            # self.enriched_data_set[j].append(entry[0])
+    def get_enrich_data_set(self):
+        for i, entry in enumerate(self.data_set, start=0):
+            self.enriched_data_set.append(self.get_enriched_feature(entry))
 
         return self.enriched_data_set
+
+    def get_enriched_feature(self, feature_vector):
+        enriched_feature = []
+        for method_name in self.features_method_names:
+            new_value = getattr(self, method_name)(feature_vector[0])
+            enriched_feature.append(new_value)
+
+        enriched_feature.append(feature_vector[1])
+
+        return enriched_feature
 
     def first_name_longer_that_last_name(self, v):
         return len(self.first_name(v)) > len(self.last_name(v))
