@@ -22,7 +22,7 @@ class DecisionTree:
         if labels_list.count(labels_list[0]) == len(labels_list):
             return labels_list[0]
 
-        # When no more features, return majority
+        # When no more features, return majority.
         if len(self.data_set[0]) == 1:
             return self.__majority_count(labels_list)
 
@@ -33,13 +33,11 @@ class DecisionTree:
             best_feature_label: {}
         }
 
-        del(self.labels[best_feature])
-
         feature_values = [example[best_feature] for example in self.data_set]
         unique_feature_values = set(feature_values)
 
         for value in unique_feature_values:
-            sub_labels = self.labels[:]
+            sub_labels = [label for i, label in enumerate(self.labels) if i != best_feature]
             tree[best_feature_label][value] = DecisionTree(
                 DataSetSplitter(self.data_set, best_feature, value).new_data_set(),
                 sub_labels
