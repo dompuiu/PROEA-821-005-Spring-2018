@@ -5,6 +5,7 @@ from data_set_features_enricher import DataSetFeaturesEnricher
 from classifier import Classifier
 from tree_utils import get_tree_depth
 from tree_pruner import TreePruner
+from data_set_classifier import DataSetClassifier
 
 # Load training data.
 original_data_set = DataSetLoader('dataset/training.data').load()
@@ -21,7 +22,7 @@ feature_creation_labels = [
 enricher = DataSetFeaturesEnricher(original_data_set, feature_creation_labels)
 data_set = enricher.get_enrich_data_set()
 
-# Create a set of short labels. Having long labels make the rendered tree unreadable.
+# Create a set of short labels. Having long labels made the rendered tree unreadable.
 short_labels = [
     'fn_longer_ls',
     'middle',
@@ -33,54 +34,20 @@ short_labels = [
 
 # Create the decision tree and render it.
 tree = DecisionTree(data_set, short_labels).make_tree()
-create_plot(tree)
+# create_plot(tree)
 
 # Prune the training set.
 pruned_tree = TreePruner(tree).prune()
-create_plot(pruned_tree)
+# create_plot(pruned_tree)
+print('Tree depth: ', get_tree_depth(tree))
 
 # Classify other results
 c = Classifier(pruned_tree, short_labels)
 
-invalid_training_set = 0
-print('Classifiying the training set:')
-for original_entry in original_data_set:
-    enrich_feature = enricher.get_enriched_feature(original_entry)
-    classifier_response = c.classify(enrich_feature)
-    if classifier_response != original_entry[1]:
-        invalid_training_set += 1
+print('\nClassify the training set: ')
+dsc = DataSetClassifier(c, enricher)
+dsc.classify_data_set(original_data_set)
 
-    print(
-        original_entry[0],
-        ' has the result ',
-        original_entry[1],
-        '. Classifier detects: ',
-        classifier_response,
-        '.'
-    )
-
-print('\n\n\nClassifiying the testing set:')
+print('\nClassify the test set: ')
 testing_data_set = DataSetLoader('dataset/test.data').load()
-invalid_testing_set = 0
-for original_entry in testing_data_set:
-    enrich_feature = enricher.get_enriched_feature(original_entry)
-    classifier_response = c.classify(enrich_feature)
-    if classifier_response != original_entry[1]:
-        invalid_testing_set += 1
-
-    print(
-        original_entry[0],
-        ' has the result ',
-        original_entry[1],
-        '. Classifier detects: ',
-        classifier_response,
-        '.'
-    )
-
-print('\n\n\nTree depth: ', get_tree_depth(tree))
-
-error = invalid_training_set / len(original_data_set)
-print('Training Set Invalid Entries: ', invalid_training_set, '. Total Training Entries: ', len(original_data_set), '. Error: ', error, '.')
-
-error = invalid_testing_set / len(testing_data_set)
-print('Testing Set Invalid Entries: ', invalid_testing_set, '. Total Testing Entries: ', len(testing_data_set), '. Error: ', error, '.')
+dsc.classify_data_set(testing_data_set)
