@@ -27,7 +27,7 @@ class DecisionTree:
         if labels_list.count(labels_list[0]) == len(labels_list):
             return labels_list[0]
 
-        # When no more features or the maximum tree depth was fullfilled, return majority.
+        # When no more features or the maximum tree depth was reached, return majority.
         if len(data_set[0]) == 1 or max_depth == 0:
             return DecisionTree.majority_count(labels_list)
 
