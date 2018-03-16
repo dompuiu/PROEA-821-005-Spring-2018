@@ -6,6 +6,7 @@ from classifier import Classifier
 from tree_utils import get_tree_depth
 from tree_pruner import TreePruner
 from data_set_classifier import DataSetClassifier
+from cross_validator import CrossValidator
 
 # Load training data.
 original_data_set = DataSetLoader('dataset/training.data').load()
@@ -17,7 +18,7 @@ feature_creation_labels = [
     'first_name_starts_and_ends_with_same_letter',
     'first_name_come_alphabetically_before_their_last_name',
     'second_letter_of_their_first_name_a_vowel',
-    'is_the_number_of_last_name_letter_even'
+    'is_the_number_of_last_name_letters_even'
 ]
 enricher = DataSetFeaturesEnricher(original_data_set, feature_creation_labels)
 data_set = enricher.get_enrich_data_set()
@@ -34,7 +35,7 @@ short_labels = [
 
 # Create the decision tree and render it.
 tree = DecisionTree(data_set, short_labels).make_tree()
-# create_plot(tree)
+create_plot(tree)
 
 # Prune the training set.
 pruned_tree = TreePruner(tree).prune()
@@ -46,8 +47,22 @@ c = Classifier(pruned_tree, short_labels)
 
 print('\nClassify the training set: ')
 dsc = DataSetClassifier(c, enricher)
-dsc.classify_data_set(original_data_set)
+results = dsc.classify_data_set(original_data_set)
+
+print('Invalid classified entries:', dsc.invalid_entries, '\nTotal entries:',
+      len(results), '\nError:', str(round(dsc.error_rate, 2)) + '%')
+
 
 print('\nClassify the test set: ')
 testing_data_set = DataSetLoader('dataset/test.data').load()
-dsc.classify_data_set(testing_data_set)
+results = dsc.classify_data_set(testing_data_set)
+print('Invalid classified entries:', dsc.invalid_entries, '\nTotal entries:',
+      len(results), '\nError:', str(round(dsc.error_rate, 2)) + '%\n')
+
+
+CrossValidator([
+    'dataset/cvs_splits/training00.data',
+    'dataset/cvs_splits/training01.data',
+    'dataset/cvs_splits/training02.data',
+    'dataset/cvs_splits/training03.data'
+]).run()
