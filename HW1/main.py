@@ -35,11 +35,11 @@ short_labels = [
 
 # Create the decision tree and render it.
 tree = DecisionTree(data_set, short_labels).make_tree()
-create_plot(tree)
+# create_plot(tree)
 
 # Prune the training set.
 pruned_tree = TreePruner(tree).prune()
-# create_plot(pruned_tree)
+create_plot(pruned_tree)
 print('Tree depth: ', get_tree_depth(tree))
 
 # Classify other results
@@ -60,6 +60,7 @@ print('Invalid classified entries:', dsc.invalid_entries, '\nTotal entries:',
       len(results), '\nError:', str(round(dsc.error_rate, 2)) + '%\n')
 
 
+print('Limiting depth:')
 CrossValidator([
     'dataset/cvs_splits/training00.data',
     'dataset/cvs_splits/training01.data',

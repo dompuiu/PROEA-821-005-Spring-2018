@@ -4,6 +4,7 @@ from data_set_loader import DataSetLoader
 from data_set_classifier import DataSetClassifier
 from classifier import Classifier
 from tree_pruner import TreePruner
+import statistics
 
 class CrossValidator:
     depths = [1, 2, 3, 4, 5, 10]
@@ -13,7 +14,11 @@ class CrossValidator:
         'first_name_starts_and_ends_with_same_letter',
         'first_name_come_alphabetically_before_their_last_name',
         'second_letter_of_their_first_name_a_vowel',
-        'is_the_number_of_last_name_letters_even'
+        'is_the_number_of_last_name_letters_even',
+        'name_shorter_that_15_chars',
+        'name_formed_from_more_than_two_words',
+        'last_letter_is_vowel',
+        'number_of_vowels_is_odd'
     ]
 
     @staticmethod
@@ -37,7 +42,7 @@ class CrossValidator:
 
         minimum_error_depth = min(errors_at_depth, key=errors_at_depth.get)
         print(
-            'Using the k-fold cross validation the minimum error rate was found for depth',
+            '\nUsing the k-fold cross validation the minimum error rate was found for depth',
             minimum_error_depth,
             '\nThe error rate at depth', minimum_error_depth, 'is', errors_at_depth[minimum_error_depth], '%'
         )
@@ -65,8 +70,11 @@ class CrossValidator:
             testing_data_set = DataSetLoader(test_fold_filename).load()
             dsc.classify_data_set(testing_data_set)
 
-            error_rates.append(dsc.error_rate)
+            error_rates.append(round(dsc.error_rate, 2))
 
+        print('At depth', depth, 'we got the error rates',
+              error_rates, 'having average', round(sum(error_rates) / len(error_rates), 2), '%',
+              'and standard deviation', round(statistics.stdev(error_rates), 2))
         return error_rates
 
     def train_and_test_final_tree(self, depth):

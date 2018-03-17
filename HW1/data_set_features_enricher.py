@@ -44,6 +44,26 @@ class DataSetFeaturesEnricher:
     def is_the_number_of_last_name_letters_even(v):
         return len(DataSetFeaturesEnricher.last_name(v)) % 2 == 0
 
+    @staticmethod
+    def name_shorter_that_15_chars(v):
+        return len(v) <= 15
+
+    @staticmethod
+    def name_formed_from_more_than_two_words(v):
+        return len(v.split(' ')) > 2
+
+    @staticmethod
+    def last_letter_is_vowel(v):
+        return v[-1] in ['a', 'e', 'i', 'o', 'u']
+
+    @staticmethod
+    def number_of_vowels_is_odd(v):
+        c = 0
+        for letter in v:
+            if letter in ['a', 'e', 'i', 'o', 'u']:
+                c += 1
+        return c % 2 == 1
+
     def get_enrich_data_set(self):
         for i, entry in enumerate(self.data_set, start=0):
             self.enriched_data_set.append(self.get_enriched_feature(entry))
