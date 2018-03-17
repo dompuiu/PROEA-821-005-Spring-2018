@@ -15,7 +15,7 @@ feature_creation_labels = [
     'first_name_starts_and_ends_with_same_letter',
     'first_name_come_alphabetically_before_their_last_name',
     'second_letter_of_their_first_name_a_vowel',
-    'is_the_number_of_last_name_letter_even'
+    'is_the_number_of_last_name_letters_even'
 ]
 enricher = DataSetFeaturesEnricher(original_data_set, feature_creation_labels)
 data_set = enricher.get_enrich_data_set()
