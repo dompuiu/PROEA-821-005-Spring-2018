@@ -7,7 +7,7 @@ class SimplePerceptron:
         self.learning_rate = learning_rate
 
     def train_weights(self, train, labels):
-        w = [randrange(-100, 100, 1) / 1000 for _ in range(len(train[0]))]
+        w = [randrange(-100, 100, 1) / 10000 for _ in range(len(train[0]))]
         # w = [0 for _ in range(len(train[0]))]
 
         for i, x in enumerate(train):
@@ -15,7 +15,7 @@ class SimplePerceptron:
             y = labels[i]
             lr = self.learning_rate
 
-            if ((np.dot(x, w)) * y) <= 0:
+            if (y * np.dot(x, w)) < 0:
                 w += x * y * lr
 
         return w
@@ -23,7 +23,7 @@ class SimplePerceptron:
     @staticmethod
     def predict(x, w):
         x = np.array(x)
-        if np.dot(x, w) <= 0:
+        if np.dot(x, w) < 0:
             return -1
         else:
             return 1
