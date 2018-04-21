@@ -8,7 +8,7 @@ class SimplePerceptronTester:
         self.training_file = training_file
         self.testing_file = testing_file
 
-    def run(self, show_weights = False):
+    def run(self, show_weights=False):
         features, labels = DataSetLoader(self.training_file).load()
 
         perceptron = SimplePerceptron()
