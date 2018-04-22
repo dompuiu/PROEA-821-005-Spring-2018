@@ -15,7 +15,7 @@ class DynamicLearningRatePerceptronTester:
             features, labels = DataSetLoader(self.training_file).load()
             perceptron = DynamicLearningRatePerceptron(learning_rate)
 
-            weights = perceptron.train_weights(features, labels)
+            weights = perceptron.train(features, labels, 20)
             if show_weights:
                 print('\nDetected weights')
                 print(weights)

@@ -3,7 +3,7 @@ import itertools
 import numpy as np
 from random import randrange
 from matplotlib import pyplot as plt
-
+from inspect import signature
 
 class CrossValidatorTester:
     @staticmethod
@@ -115,8 +115,20 @@ class CrossValidatorTester:
         development_features, development_labels = DataSetLoader(self.development_file).load()
         w = np.array([randrange(-100, 100, 1) / 10000 for _ in range(len(features[0]))])
 
-        for _ in range(20):
-            w, updates_count = perceptron.train_one_epoch(features, labels, w)
+        for epoch in range(20):
+            # The `train_one_epoch` has various signatures depending on the perceptron type used.
+            # From all the possible parameters we are selecting only the ones that we infer from the method signature.
+            train_method_parameters = self.get_train_method_parameters(
+                perceptron.train_one_epoch,
+                {
+                    'train': features,
+                    'labels': labels,
+                    'w': w,
+                    'epoch': epoch
+                }
+            )
+            w, updates_count = perceptron.train_one_epoch(*train_method_parameters)
+
             error_rate = self.calculate_error_rate(
                 development_features,
                 development_labels,
@@ -165,3 +177,12 @@ class CrossValidatorTester:
         hyper_parameters_names.append('')
 
         return ': {:.2f}    '.join(hyper_parameters_names).format(*hyper_parameter_list[:])
+
+    def get_train_method_parameters(self, method, all_parameters):
+        train_one_epoch_signature = signature(method)
+        result = []
+        for param_name in train_one_epoch_signature.parameters:
+            result.append(all_parameters[param_name])
+
+        return result
+
