@@ -1,8 +1,8 @@
 from data_set_loader import DataSetLoader
-from simple_perceptron import SimplePerceptron
+from dynamic_learning_rate_perceptron import DynamicLearningRatePerceptron
 
 
-class SimplePerceptronTester:
+class DynamicLearningRatePerceptronTester:
     def __init__(self, learning_rates, training_file, testing_file):
         self.learning_rates = learning_rates
         self.training_file = training_file
@@ -10,12 +10,12 @@ class SimplePerceptronTester:
 
     def run(self, show_weights=False):
         for learning_rate in self.learning_rates:
-            print('\nSimple perceptron with learning rate %.2f' % learning_rate)
+            print('\nDynamic learning rate perceptron with learning rate %.2f' % learning_rate)
 
             features, labels = DataSetLoader(self.training_file).load()
-            perceptron = SimplePerceptron(learning_rate)
-            weights = perceptron.train_weights(features, labels)
+            perceptron = DynamicLearningRatePerceptron(learning_rate)
 
+            weights = perceptron.train_weights(features, labels)
             if show_weights:
                 print('\nDetected weights')
                 print(weights)
@@ -24,7 +24,7 @@ class SimplePerceptronTester:
             invalid_entries = 0
 
             for i, x in enumerate(test_features):
-                y1 = SimplePerceptron.predict(x, weights)
+                y1 = DynamicLearningRatePerceptron.predict(x, weights)
                 y = test_labels[i]
 
                 if y1 != y:
