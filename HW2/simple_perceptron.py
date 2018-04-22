@@ -8,7 +8,7 @@ class SimplePerceptron:
         self.epochs = epochs
 
     def train_weights(self, train, labels):
-        w = [randrange(-100, 100, 1) / 10000 for _ in range(len(train[0]))]
+        w = np.array([randrange(-100, 100, 1) / 10000 for _ in range(len(train[0]))])
         lr = self.learning_rate
         order = [i for i in range(len(train))]
 
