@@ -3,26 +3,32 @@ from random import randrange, shuffle
 
 
 class SimplePerceptron:
-    def __init__(self, learning_rate=1, epochs=20):
+    def __init__(self, learning_rate=1):
         self.learning_rate = learning_rate
-        self.epochs = epochs
 
-    def train_weights(self, train, labels):
+    def train(self, train, labels, epochs):
         w = np.array([randrange(-100, 100, 1) / 10000 for _ in range(len(train[0]))])
-        lr = self.learning_rate
-        order = [i for i in range(len(train))]
 
-        for _ in range(self.epochs):
-            shuffle(order)
-
-            for i in order:
-                x = np.array(train[i])
-                y = labels[i]
-
-                if (y * np.dot(x, w)) < 0:
-                    w += x * y * lr
+        for _ in range(epochs):
+            w, _ = self.train_one_epoch(train, labels, w)
 
         return w
+
+    def train_one_epoch(self, train, labels, w):
+        lr = self.learning_rate
+        order = [i for i in range(len(train))]
+        shuffle(order)
+        updates_count = 0
+
+        for i in order:
+            x = np.array(train[i])
+            y = labels[i]
+
+            if (y * np.dot(x, w)) < 0:
+                w += x * y * lr
+                updates_count += 1
+
+        return w, updates_count
 
     @staticmethod
     def predict(x, w):

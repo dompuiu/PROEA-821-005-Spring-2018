@@ -14,15 +14,15 @@ class SimplePerceptronTester:
 
             features, labels = DataSetLoader(self.training_file).load()
             perceptron = SimplePerceptron(learning_rate)
-            weights = perceptron.train_weights(features, labels)
+            weights = perceptron.train(features, labels, 20)
 
             if show_weights:
                 print('\nDetected weights')
                 print(weights)
 
             test_features, test_labels = DataSetLoader(self.testing_file).load()
-            invalid_entries = 0
 
+            invalid_entries = 0
             for i, x in enumerate(test_features):
                 y1 = SimplePerceptron.predict(x, weights)
                 y = test_labels[i]
