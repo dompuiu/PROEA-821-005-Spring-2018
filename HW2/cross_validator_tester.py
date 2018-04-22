@@ -114,20 +114,34 @@ class CrossValidatorTester:
         features, labels = CrossValidatorTester.get_data_for(self.training_files)
         development_features, development_labels = DataSetLoader(self.development_file).load()
         w = np.array([randrange(-100, 100, 1) / 10000 for _ in range(len(features[0]))])
+        u = np.array([0.0 for _ in range(len(features[0]))])
 
-        for epoch in range(20):
+        train_method_parameters = self.get_train_method_parameters(
+            perceptron.train_one_epoch,
+            {
+                'train': features,
+                'labels': labels,
+                'w': w,
+                'u': u,
+                'c': 1,
+                'epoch': 0
+            }
+        )
+
+        for _ in range(20):
             # The `train_one_epoch` has various signatures depending on the perceptron type used.
             # From all the possible parameters we are selecting only the ones that we infer from the method signature.
-            train_method_parameters = self.get_train_method_parameters(
-                perceptron.train_one_epoch,
-                {
-                    'train': features,
-                    'labels': labels,
-                    'w': w,
-                    'epoch': epoch
-                }
-            )
-            w, updates_count = perceptron.train_one_epoch(*train_method_parameters)
+
+            new_train_method_parameters = perceptron.train_one_epoch(*train_method_parameters)
+            updates_count = new_train_method_parameters.pop(0)
+            new_train_method_parameters.insert(0, labels)
+            new_train_method_parameters.insert(0, features)
+            train_method_parameters = new_train_method_parameters
+
+            if self.cls.__name__ == 'AveragedPerceptron':
+                w = train_method_parameters[3] / train_method_parameters[4]
+            else:
+                w = train_method_parameters[2]
 
             error_rate = self.calculate_error_rate(
                 development_features,
@@ -147,7 +161,7 @@ class CrossValidatorTester:
             'Minimum error rate: %.2f%% Epoch: %d DEVELOPMENT SET ACCURACY %.2f%% UPDATES PERFORMED DURING TRAINING %d'
             % (
                 min(error_rates),
-                error_rates.index(min(error_rates)) + 1,
+                error_rates.index(min(error_rates)),
                 100 - min(error_rates),
                 total_updates
             )

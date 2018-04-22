@@ -10,7 +10,7 @@ class SimplePerceptron:
         w = np.array([randrange(-100, 100, 1) / 10000 for _ in range(len(train[0]))])
 
         for _ in range(epochs):
-            w, _ = self.train_one_epoch(train, labels, w)
+            [_, w] = self.train_one_epoch(train, labels, w)
 
         return w
 
@@ -28,7 +28,7 @@ class SimplePerceptron:
                 w += x * y * lr
                 updates_count += 1
 
-        return w, updates_count
+        return [updates_count, w]
 
     @staticmethod
     def predict(x, w):
