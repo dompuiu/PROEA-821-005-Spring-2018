@@ -3,6 +3,17 @@ from dynamic_learning_rate_perceptron import DynamicLearningRatePerceptron
 from margin_perceptron import MarginPerceptron
 from averaged_perceptron import AveragedPerceptron
 from cross_validator_tester import CrossValidatorTester
+from majority_baseline_classifier_tester import MajorityBaselineClassifierTester
+
+print('\n#################')
+print('\nMajority Baseline')
+print('\n#################')
+
+MajorityBaselineClassifierTester(
+    'dataset/phishing.train',
+    'dataset/phishing.dev',
+    'dataset/phishing.test'
+).run()
 
 print('\n#################')
 print('\nSimple perceptron')
