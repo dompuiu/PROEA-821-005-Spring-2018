@@ -38,7 +38,7 @@ class CrossValidatorTester:
     def run(self):
         best_hyperparameters, error_rate = self.detect_best_hyperparameters()
         print(
-            'BEST HYPER-PARAMETERS: %s CROSS VALIDATION ACCURACY %.2f%%' % (
+            'BEST HYPER-PARAMETERS: %s CROSS VALIDATION ACCURACY: %.2f%%' % (
                 self.get_print_value(best_hyperparameters),
                 100 - error_rate
             )
