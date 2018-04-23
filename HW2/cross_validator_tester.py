@@ -5,13 +5,14 @@ from random import randrange
 from matplotlib import pyplot as plt
 from inspect import signature
 
+
 class CrossValidatorTester:
     @staticmethod
     def plot(error_rates, title):
         plt.title(title)
-        plt.plot(error_rates)
+        plt.plot(100 - np.array(error_rates))
         plt.xlabel('Epoch')
-        plt.ylabel('Total Loss')
+        plt.ylabel('Development set accuracy')
         plt.show()
 
     @staticmethod
@@ -151,8 +152,9 @@ class CrossValidatorTester:
 
             if error_rate < best_error_rate:
                 best_error_rate = error_rate
-                total_updates = updates_count
                 best_w = w
+
+            total_updates += updates_count
 
             error_rates.append(error_rate)
 
