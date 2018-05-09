@@ -2,8 +2,9 @@ from collections import deque
 
 
 class DataSetLoader:
-    def __init__(self, filename):
+    def __init__(self, filename, size=67692):
         self.filename = filename
+        self.size = size
 
     def load(self):
         features = []
@@ -12,9 +13,7 @@ class DataSetLoader:
         with open(self.filename, 'r') as ins:
             for line in ins:
                 line = line.rstrip('\n')
-                feature_row = {
-                    0: 1
-                }
+                feature_row = [1 if i == 0 else 0 for i in range(self.size + 1)]
 
                 pieces = deque(line.split(' '))
                 labels.append(int(pieces.popleft()))
@@ -24,9 +23,10 @@ class DataSetLoader:
                     if not feature_parts[0]:
                         break
 
-                    key = int(feature_parts[0])
-                    value = int(feature_parts[1])
-                    feature_row[key] = value
+                    try:
+                        feature_row[int(feature_parts[0])] = float(feature_parts[1])
+                    except IndexError:
+                        print(feature_parts)
 
                 features.append(feature_row)
 

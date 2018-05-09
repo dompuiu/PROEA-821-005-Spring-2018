@@ -1,4 +1,3 @@
-from data_set_loader import DataSetLoader
 from cross_validator_tester import CrossValidatorTester
 from svm import SVM
 
@@ -14,5 +13,8 @@ CrossValidatorTester(
         'dataset/CVSplits/training03.data',
         'dataset/CVSplits/training04.data'
     ],
-    'dataset/phishing.test'
+    'dataset/speeches.train.liblinear',
+    'dataset/speeches.test.liblinear'
 ).run()
+
+
