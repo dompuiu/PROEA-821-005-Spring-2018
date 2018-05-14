@@ -60,9 +60,9 @@ CrossValidatorTester(
     ],
     'dataset/speeches.test.liblinear',
     1,
-    10,
-    True, # If -1 should be saved as 0. SciPy sparsed matrixes has helper methods that work only for 0s and non 0s.
-    200 # How many features to load from the file (don't load all features due to computation limitations)
+    1,
+    True,  # If -1 should be saved as 0. SciPy sparsed matrixes has helper methods that work only for 0s and non 0s.
+    200  # How many features to load from the file (don't load all features due to computation limitations)
 ).run()
 
 BaggedForestValidatorTester(
