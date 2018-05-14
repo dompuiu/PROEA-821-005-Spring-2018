@@ -1,7 +1,7 @@
 from collections import deque
 from scipy.sparse import csr_matrix
 import numpy as np
-
+from random import sample
 
 class DataSetLoader:
     def __init__(self, filename, size=67692):
@@ -40,6 +40,7 @@ class DataSetLoader:
                 row += 1
 
         data = np.ones(len(cols))
+        # indexes = sample(range(0, row - 1), self.size)
 
         return csr_matrix((data, (rows, cols)), shape=(row, self.size + 1), dtype=np.float128), \
                csr_matrix(labels, dtype=np.float128)

@@ -5,6 +5,7 @@ import itertools
 import math
 import numpy as np
 from inspect import signature
+import pickle
 
 
 class EnsembleValidatorTester:
@@ -23,7 +24,7 @@ class EnsembleValidatorTester:
 
         return features, labels.T, test_features, test_labels.T
 
-    def __init__(self, cls, predictor_cls, hyper_parameters, hyper_parameter_epochs, training_file, test_file, train_epochs, trees_count, features_count=67692):
+    def __init__(self, cls, predictor_cls, hyper_parameters, hyper_parameter_epochs, training_file, test_file, zeros, train_epochs, trees_count, features_count=67692):
         self.cls = cls
         self.predictor_cls = predictor_cls
         self.hyper_parameters_names = list(hyper_parameters.keys())
@@ -31,18 +32,32 @@ class EnsembleValidatorTester:
         self.hyper_parameters = [list(x) for x in itertools.product(*hyper_parameters.values())]
         self.training_file = training_file
         self.test_file = test_file
+        self.zeros = zeros
         self.train_epochs = train_epochs
         self.trees_count = trees_count
         self.features_count = features_count
 
     def run(self):
         train_features, train_labels = DataSetLoader(self.training_file, self.features_count).load(True)
-        test_features, test_labels = DataSetLoader(self.test_file, self.features_count).load(True)
+        test_features, test_labels = DataSetLoader(self.test_file, self.features_count).load(self.zeros)
 
-        classifier = BaggedForest(self.trees_count)
-        trees = classifier.train(train_features, train_labels)
+        file = True
+        try:
+            b = open('mytrees.bin', 'rb')
+        except FileNotFoundError:
+            file = False
 
-        features_list = EnsembleValidatorTester.generate_features_list(train_features, trees)
+        if not file:
+            classifier = BaggedForest(self.trees_count)
+            trees = classifier.train(train_features, train_labels)
+            binary_file = open('mytrees.bin', mode='wb')
+            pickle.dump(trees, binary_file)
+            binary_file.close()
+        else:
+            print('Skipping trees generation. Found previous trees in file.')
+            trees = pickle.load(b)
+
+        features_list = self.generate_features_list(train_features, trees)
         best_hyperparameters, error_rate = self.detect_best_hyperparameters(features_list, train_labels)
         print(
             'BEST HYPER-PARAMETERS: %s CROSS VALIDATION ACCURACY: %.2f%%' % (
@@ -51,6 +66,7 @@ class EnsembleValidatorTester:
             )
         )
 
+        train_features, train_labels = DataSetLoader(self.training_file, self.features_count).load(self.zeros)
         w = self.train(best_hyperparameters, train_features, train_labels)
 
         error_rate = self.calculate_error_rate(train_features, train_labels, w)
@@ -88,6 +104,23 @@ class EnsembleValidatorTester:
 
     def get_cross_validation_error_rates_for(self, classifier_cls_init_parameters, all_features, all_labels):
         error_rates = []
+
+        if not self.zeros:
+            all_labels = all_labels.toarray()
+            all_labels[all_labels == 0] = -1
+            all_labels = csr_matrix(all_labels)
+
+            all_features = all_features.toarray()
+            all_features[all_features == 0] = -1
+            all_features = csr_matrix(all_features)
+        else:
+            all_labels = all_labels.toarray()
+            all_labels[all_labels == -1] = 0
+            all_labels = csr_matrix(all_labels)
+
+            all_features = all_features.toarray()
+            all_features[all_features == -1] = 0
+            all_features = csr_matrix(all_features)
 
         for cross_validation_epoch in range(5):
             features, labels, test_features, test_labels = \
@@ -153,15 +186,34 @@ class EnsembleValidatorTester:
 
         return best_w
 
-    @staticmethod
-    def generate_features_list(entries, trees):
-        predictor_cls = EnsembleFeatureCreator(trees)
-        features = []
+    def generate_features_list(self, entries, trees):
+        file = True
+        try:
+            b = open('myfeatures.bin', 'rb')
+        except FileNotFoundError:
+            file = False
 
-        for i, x in enumerate(entries):
-            features.append(predictor_cls.predict(x))
+        if not file:
+            predictor_cls = EnsembleFeatureCreator(trees)
+            features = []
 
-        return csr_matrix(features)
+            for i, x in enumerate(entries):
+                predictions = np.array(predictor_cls.predict(x))
+
+                if not self.zeros:
+                    predictions[predictions == 0] = -1
+
+                features.append(predictions.tolist())
+
+            features = csr_matrix(features)
+            binary_file = open('myfeatures.bin', mode='wb')
+            pickle.dump(features, binary_file)
+            binary_file.close()
+        else:
+            print('Skipping features generation. Found previous features in file.')
+            features = pickle.load(b)
+
+        return features
 
     def get_print_value(self, hyper_parameter_list):
         hyper_parameters_names = self.hyper_parameters_names[:]
@@ -170,7 +222,6 @@ class EnsembleValidatorTester:
         return ': {:.4f}    '.join(hyper_parameters_names).format(*hyper_parameter_list[:])
 
     def calculate_error_rate(self, test_features, test_labels, weights):
-        test_labels = test_labels
         invalid_entries = 0
         predictor_cls = self.predictor_cls(weights)
 
