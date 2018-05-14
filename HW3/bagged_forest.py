@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.sparse import csr_matrix
 from decision_tree import DecisionTree
+from tree_plotter import create_plot
 
 
 class BaggedForest:
@@ -11,7 +12,7 @@ class BaggedForest:
         trees = []
 
         for i in range(self.trees_count):
-            if i > 0 and i % 100 == 0:
+            if i > 0 and i % 10 == 0:
                 print('Generating tree ' + str(i) + '...')
 
             random_indexes = np.round((train.shape[0] - 1) * np.random.random_sample(100))
@@ -21,6 +22,7 @@ class BaggedForest:
             labels_description = ['Feature ' + str(i) for i in range(train.shape[1])]
 
             tree = DecisionTree(random_entries, random_labels, labels_description, 3).make_tree()
+            # create_plot(tree)
             trees.append(tree)
 
         print('Generated ' + str(i) + ' trees.')

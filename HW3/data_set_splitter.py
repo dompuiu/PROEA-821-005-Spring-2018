@@ -15,7 +15,7 @@ class DataSetSplitter:
         if self.filter_value == 1:
             indices = f.nonzero()[0]
         else:
-            indices = np.where(f.toarray() == 0)[1]
+            indices = np.where(f.toarray() == 0)[0]
 
         sub_features_list = csr_matrix(np.delete(self.features_list[indices].toarray(), self.column, axis=1))
 

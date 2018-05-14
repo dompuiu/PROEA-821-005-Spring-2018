@@ -19,7 +19,7 @@ class BestFeatureFinder:
             sub_features_list, sub_labels_list = \
                 DataSetSplitter(self.features_list, self.labels_list, feature_number, value).new_data_set()
 
-            probability = sub_features_list.size / float(self.data_set_entries_count)
+            probability = sub_features_list.shape[0] / float(self.data_set_entries_count)
             entropy += probability * Entropy(sub_features_list, sub_labels_list).value()
 
         return entropy
