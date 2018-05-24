@@ -1,6 +1,6 @@
 # This is a test to test my implementation
 import time
-from sklearn import linear_model
+from sklearn import ensemble
 from data_set_loader import DataSetLoader
 from label_writer import LabelWriter
 
@@ -25,12 +25,7 @@ feature_creation_labels = [
 
 features, labels = DataSetLoader('../TwitterDataset/data-splits/data.train').load()
 test_features, test_labels = DataSetLoader('../TwitterDataset/data-splits/data.test').load()
-clf = linear_model.Perceptron(
-    max_iter=5000,
-    tol=None,
-    n_jobs=3,
-    warm_start=True
-)
+clf = ensemble.RandomForestClassifier()
 clf.fit(features, labels)
 
 predicted = clf.predict(features)
@@ -47,12 +42,13 @@ for idx, val in enumerate(predicted):
     if predicted[idx] != test_labels[idx]:
         counter += 1
 
-print('Error rate', counter / float(len(predicted)) * 100)
+print('Test Error rate', counter / float(len(predicted)) * 100)
 
 timestamp = time.strftime('%b-%d-%Y_%H%M', time.localtime())
 LabelWriter(
     '../TwitterDataset/data-splits/data.eval.anon',
     '../TwitterDataset/data-splits/data.eval.id',
-    '../TwitterDataset/output/06-perceptron-scikit' + timestamp + '.csv',
+    '../TwitterDataset/output/09-bagged-forest' + timestamp + '.csv',
     clf
 ).write()
+
